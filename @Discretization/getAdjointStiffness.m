@@ -1,4 +1,29 @@
 function L = getAdjointStiffness( obj, U )
+%getAdjointStiffness - Calculates the adjoint stiffness matrix L
+% The adjoint stiffness matrix satisfies Khat(mu)Ubar = L(Ubar)mu
+%
+% Syntax:  L = getAdjointStiffness(obj, U)
+%
+% Inputs:
+%    obj - The discretization
+%    U   - The solution to find L(U)
+%
+% Outputs:
+%    L   - The adjoint stiffness matrix.
+%
+% Example: 
+%    L = d.getAdjointStiffness(U)
+%
+% Other m-files required: none
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also: Discretization
+%
+% Author:  Brian C. Winkler
+% Email:   brian.c.winkler@gmail.com
+% Created: 2014-11-13
+%
 
   L = gf_asm('volumic',[ ...
              'u=data(#2);',...
@@ -10,4 +35,3 @@ function L = getAdjointStiffness( obj, U )
              obj.meshFemD,...
              obj.meshFemU,...
              U);
-end
