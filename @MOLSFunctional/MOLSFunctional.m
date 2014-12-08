@@ -11,9 +11,9 @@ classdef MOLSFunctional < ObjectiveFunctional
         
     end
     methods
-        function obj = MOLSFunctional( s )
+        function obj = MOLSFunctional( s, Zbar, Zhat )
         % Summary of class constructor.
-            obj@ObjectiveFunctional(s);
+            obj@ObjectiveFunctional(s, Zbar, Zhat);
         end
     end
 end
