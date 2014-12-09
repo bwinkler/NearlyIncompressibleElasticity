@@ -22,25 +22,26 @@ function varargout = eval( obj, muDsc )
     S = obj.solutionMap;
     Zbar = obj.Zbar;
     Zhat = obj.Zhat;
+    Zbn = obj.Zbn;
 
     [Ubar, P] = d.splitU( S(muDsc) );
 
 
-    Jval = 0.5*(Ubar - Zbar)' * d.KhatFull * (Ubar - Zbar);
-    Jval = Jval + 0.5*(Ubar - Zbar)' * d.Bfull * (P - Zhat);
-    Jval = Jval - (P - Zhat)' * d.C * (P - Zhat);
+    %Jval = 0.5*(Ubar - Zbar)' * d.KhatFull * (Ubar - Zbar);
+    %Jval = Jval + (Ubar - Zbar)' * d.Bfull * (P - Zhat);
+    %Jval = Jval - 0.5 * (P - Zhat)' * d.C * (P - Zhat);
 
-    %Un = d.Q' * Ubar;
-    %Jval = 0.5*(Un - Zn)' * d.Khat * (Un - Zn);
-    %Jval = Jval + 0.5*(Un - Zn)' * d.B * (P - Zhat);
-    %Jval = Jval - (P - Zhat)' * d.C * (P - Zhat);
+    Un = d.Q' * Ubar;
+    Jval = 0.5*(Un - Zbn)' * d.Khat * (Un - Zbn);
+    Jval = Jval + (Un - Zbn)' * d.B * (P - Zhat);
+    Jval = Jval - 0.5*(P - Zhat)' * d.C * (P - Zhat);
 
     varargout{1} = Jval;
 
     if( nargout > 1)
         % Calculate the gradient.
-       L = d.getAdjointStiffness(Ubar + Zbar); 
-       gJ = -0.5* L' * (Ubar - Zbar);
+       L = d.Q'*d.getAdjointStiffness(Ubar + Zbar); 
+       gJ = -0.5* L' * (Un - Zbn);
        varargout{2} = gJ;
     end
 
