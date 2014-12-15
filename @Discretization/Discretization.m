@@ -108,7 +108,7 @@ classdef Discretization < handle
                 d.Md        = gf_asm('mass_matrix', integrationMethod, meshFemD);
 
                 onesDsc     = gf_mesh_fem_get(meshFemD, 'eval', {1} );
-                %d.Ku = gf_asm('laplacian', integrationMethod, meshFemU, meshFemD, onesDsc );
+                d.Ku        = d.getKhat(onesDsc);
                 d.Kp        = gf_asm('laplacian', integrationMethod, meshFemP, meshFemD, onesDsc );
                 d.Kd        = gf_asm('laplacian', integrationMethod, meshFemD, meshFemD, onesDsc );
             end

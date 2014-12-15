@@ -12,17 +12,19 @@ classdef ObjectiveFunctional < Functional
         Zbar           % Data for Ubar
         Zbn            % Zbar with Dirichlet constraints
         Zhat           % Data for P
+        gradientMethod % Method for calculating the gradient
     end
     methods
-        function obj = ObjectiveFunctional( s, Zbar, Zhat )
+        function obj = ObjectiveFunctional( s, Zbar, Zhat, gradientMethod )
         % Summary of class constructor.
             obj@Functional();
             if nargin > 0
                 obj.discretization = s.discretization;
-                obj.solutionMap = s;
-                obj.Zbar = Zbar;
-                obj.Zbn  = obj.discretization.Q' * Zbar;
-                obj.Zhat = Zhat;
+                obj.solutionMap    = s;
+                obj.Zbar           = Zbar;
+                obj.Zbn            = obj.discretization.Q' * Zbar;
+                obj.Zhat           = Zhat;
+                obj.gradientMethod = gradientMethod;
             end
         end
     end

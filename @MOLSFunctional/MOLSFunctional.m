@@ -11,9 +11,9 @@ classdef MOLSFunctional < ObjectiveFunctional
         
     end
     methods
-        function obj = MOLSFunctional( s, Zbar, Zhat )
+        function obj = MOLSFunctional( s, Zbar, Zhat, gradientMethod )
         % Summary of class constructor.
-            obj@ObjectiveFunctional(s, Zbar, Zhat);
+            obj@ObjectiveFunctional(s, Zbar, Zhat, gradientMethod );
         end
     end
 end

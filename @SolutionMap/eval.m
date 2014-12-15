@@ -25,9 +25,20 @@ function [U, gU, hU] = eval(obj, muDsc)
 
     U = obj.solve();
 
-    if nargout > 1
-        error('SolutionMap: Gradient and Hessian of solution map not yet supported');
+    switch nargout
+    case {0,1}
+    case 2
+        [Ubar, P] = d.splitU( U );
+        L         = d.Q'*d.getAdjointStiffness( Ubar );
+        gUbar     = -(d.Khat + obj.BCiB) \ L;
+        gP        = obj.CiB * gUbar;
+        gU        = [ gUbar; gP ];
+    case 3
+        error('Hessian of solution map not implemented');
+    otherwise
+        error('Error using solution map: too many output argments');
     end
+
 end
 
 

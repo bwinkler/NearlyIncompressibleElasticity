@@ -19,16 +19,30 @@ function varargout = eval( obj, muDsc )
 % Created: 2014-11-13
 %
     d = obj.discretization;
+    S = obj.solutionMap;
 
-    varargout{1} = 1;
-
-    if( nargout > 1)
-        % Calculate the gradient.
-        varargout{2} = zeros(d.dDOF,1);
+    
+    switch nargout
+    case {0,1}
+        [Ubar, P]    = d.splitU( S(muDsc) );
+        varargout{1} = obj.getFunctionalValue( Ubar, P );
+    case 2
+        switch obj.gradientMethod
+        case 'Adjoint Stiffness'
+            [U, gU]      = S(muDsc);
+            [Ubar, P]    = d.splitU( U );
+            [gUbar, ~]   = d.splitGradientU( gU );
+            varargout{1} = obj.getFunctionalValue( Ubar, P);
+            varargout{2} = obj.getAdjointStiffnessGradient( Ubar, P, gUbar );
+        case 'Adjoint'
+            [Ubar, P]    = d.splitU( S(muDsc) );
+            varargout{1} = obj.getFunctionalValue( Ubar, P);
+            varargout{2} = obj.getAdjointGradient( Ubar, P );
+        otherwise
+            error('Gradient method not implemented');
+        end
+    case 3
+        error('Hessian for OLS method not implemented');
     end
 
-    if( nargout == 3)
-        % Calculate the Hessian.
-        varargout{3} = zeros(d.dDOF, d.dDOF);
-    end
 end
