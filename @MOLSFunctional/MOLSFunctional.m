@@ -8,12 +8,14 @@ classdef MOLSFunctional < ObjectiveFunctional
     % Email:   brian.c.winkler@gmail.com
     % Created: 2014-11-13
     properties
-        
+        Lzb;  % L(Zbar)
     end
     methods
         function obj = MOLSFunctional( s, Zbar, Zhat, gradientMethod )
         % Summary of class constructor.
             obj@ObjectiveFunctional(s, Zbar, Zhat, gradientMethod );
+            d = obj.discretization;
+            obj.Lzb = d.Q'*d.getAdjointStiffness(obj.Zbar);
         end
     end
 end

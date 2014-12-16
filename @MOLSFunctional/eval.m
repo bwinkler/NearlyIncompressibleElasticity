@@ -21,17 +21,32 @@ function varargout = eval( obj, muDsc )
     d = obj.discretization;
     S = obj.solutionMap;
 
-    [Ubar, P] = d.splitU( S(muDsc) );
-
-    varargout{1} = obj.getFunctionalValue( Ubar, P );
-
-    if( nargout > 1)
-        % Calculate the gradient.
-       varargout{2} = obj.getAdjointStiffnessGradient( Ubar, P );
-    end
-
-    if( nargout == 3)
-        % Calculate the Hessian.
-        varargout{3} = zeros(d.dDOF, d.dDOF);
+    switch nargout
+    case {0,1}
+        [Ubar, P]    = d.splitU( S(muDsc) );
+        varargout{1} = obj.getFunctionalValue( Ubar, P );
+    case 2
+        switch obj.gradientMethod
+        case 'Adjoint Stiffness'
+            [Ubar, P]    = d.splitU( S(muDsc) );
+            varargout{1} = obj.getFunctionalValue( Ubar, P );
+            varargout{2} = obj.getAdjointStiffnessGradient( Ubar, P );
+        otherwise
+            error('MOLS: Gradient method not implemented');
+        end
+    case 3
+        switch obj.gradientMethod
+        case 'Adjoint Stiffness'
+            [U, gU] = S(muDsc);
+            [Ubar, P]  = d.splitU( U );
+            [gUbar, gP] = d.splitGradientU( gU );
+            varargout{1} = obj.getFunctionalValue( Ubar, P );
+            [varargout{2}, Lub] = obj.getAdjointStiffnessGradient( Ubar, P );
+            varargout{3} = obj.getAdjointStiffnessHessian( gUbar, Lub);
+        otherwise
+            error('MOLS: Gradient/Hessian method not implemented');
+        end
+    otherwise
+        error('MOLS: Too many output arguments');
     end
 end

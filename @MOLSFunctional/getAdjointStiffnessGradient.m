@@ -1,4 +1,4 @@
-function g = getAdjointStiffnessGradient( o, Ubar, P )
+function varargout = getAdjointStiffnessGradient( o, Ubar, P )
 %getAdjointStiffnessGradient - Description
 %
 % Syntax:  output = getAdjointStiffnessGradient(input)
@@ -23,6 +23,15 @@ function g = getAdjointStiffnessGradient( o, Ubar, P )
 %
     d  = o.discretization;
     Un = d.Q' * Ubar;
-    L  = d.Q'*d.getAdjointStiffness(Ubar + o.Zbar);
+    Lub = d.Q'*d.getAdjointStiffness(Ubar); 
+    L   = (Lub + o.Lzb);
     g  = -0.5* L' * (Un - o.Zbn);
+
+    switch nargout
+    case {0,1}
+        varargout{1} = g;
+    case 2
+        varargout{1} = g;
+        varargout{2} = Lub;
+    end
 end

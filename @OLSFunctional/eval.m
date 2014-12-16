@@ -31,10 +31,10 @@ function varargout = eval( obj, muDsc )
         case 'Adjoint Stiffness'
             [U, gU]      = S(muDsc);
             [Ubar, P]    = d.splitU( U );
-            [gUbar, ~]   = d.splitGradientU( gU );
+            gUbar        = d.splitGradientU( gU );
             varargout{1} = obj.getFunctionalValue( Ubar, P);
             varargout{2} = obj.getAdjointStiffnessGradient( Ubar, P, gUbar );
-        case 'Adjoint'
+        case {'Adjoint', 'Hybrid'}
             [Ubar, P]    = d.splitU( S(muDsc) );
             varargout{1} = obj.getFunctionalValue( Ubar, P);
             varargout{2} = obj.getAdjointGradient( Ubar, P );
@@ -42,7 +42,20 @@ function varargout = eval( obj, muDsc )
             error('Gradient method not implemented');
         end
     case 3
-        error('Hessian for OLS method not implemented');
+        switch obj.gradientMethod
+        case {'Adjoint Stiffness','Adjoint'}
+            error('Hessian using the given method not implemented');
+        case 'Hybrid'
+            [U, gU]      = S(muDsc);
+            [Ubar, P]    = d.splitU( U );
+            gUbar   = d.splitGradientU( gU );
+            varargout{1} = obj.getFunctionalValue( Ubar, P);
+            [varargout{2}, LW] = obj.getAdjointGradient( Ubar, P );
+            varargout{3} = obj.getHybridHessian( Ubar, gUbar, LW);
+        otherwise
+            error('Incorrect method for calculating the Hessian');
+        end
+
     end
 
 end

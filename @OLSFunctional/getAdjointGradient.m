@@ -1,4 +1,4 @@
-function g = getAdjointGradient(o, Ubar, P)
+function varargout = getAdjointGradient(o, Ubar, P)
 %getAdjointGradient - Description
 %
 % Syntax:  output = getAdjointGradient(input)
@@ -23,7 +23,27 @@ function g = getAdjointGradient(o, Ubar, P)
 %
 
     d = o.discretization;
-    Un = d.Q' * Ubar;
+    % Zero boundary conditions 
+    % Best
+    [ Wn, Pw ] = d.splitU( d.K \ [ d.Q'*d.Mu*(o.Zbar - Ubar) ; zeros(d.pDOF,1) ]);
+    W = d.Q*Wn;
+    L = d.getAdjointStiffness( W );
+    g = Ubar' * L;
+    g = g';
+
+    switch nargout
+    case {0,1}
+        varargout{1} = g;
+    case 2
+        varargout{1} = g;
+        varargout{2} = L;
+    end
+
+end
+
+    % The gallery of incorrect/useless adjoint code:
+
+    %Un = d.Q' * Ubar;
 
     %dirichletBoundaries = { UnitSquareDiscretization.Boundaries.Top,...
                         %UnitSquareDiscretization.Boundaries.Bottom, ...
@@ -76,19 +96,11 @@ function g = getAdjointGradient(o, Ubar, P)
     %g = Ubar' * L;
     %g = g';
 
-    % Zero boundary conditions 
-    % Best
-    %[ Wn, Pw ] = d.splitU( d.K \ [ d.Q'*d.Mu*(o.Zbar - Ubar) ; zeros(d.pDOF,1) ]);
+    %[ Wn, Pw ] = d.splitU( d.K \ [ d.Q'*d.Mu*d.Q*(o.Zbn - Un) ; zeros(d.pDOF,1) ]);
     %W = d.Q*Wn;
     %L = d.getAdjointStiffness( Ubar );
     %g = W' * L;
     %g = g';
-
-    [ Wn, Pw ] = d.splitU( d.K \ [ d.Q'*d.Mu*d.Q*(o.Zbn - Un) ; zeros(d.pDOF,1) ]);
-    W = d.Q*Wn;
-    L = d.getAdjointStiffness( Ubar );
-    g = W' * L;
-    g = g';
 
 
     % With full system, no boundary conditions
@@ -98,6 +110,3 @@ function g = getAdjointGradient(o, Ubar, P)
     %L = d.getAdjointStiffness( Ubar );
     %g = W' * L;
     %g = g';
-
-end
-
