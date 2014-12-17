@@ -49,6 +49,7 @@ classdef Discretization < handle
         Ku
         Kp
         Kd
+        meshPoints       % Mesh as vector of X,Y coordinates
     end
     methods
         function d = Discretization( mesh,...
@@ -95,22 +96,25 @@ classdef Discretization < handle
                                  meshFemD, ...
                                  repmat( eye(2), [1, 1, d.dDOF ] ),...
                                  d.dirDsc );
-                [d.Q, d.Ud] = gf_spmat_get(H, 'dirichlet_nullspace', R);
-                d.Ud        = d.Ud';
+                [d.Q, d.Ud]  = gf_spmat_get(H, 'dirichlet_nullspace', R);
+                d.Ud         = d.Ud';
 
-                d.B         = d.Q' * d.Bfull;
-                d.G         = -d.Bfull'*d.Ud;
-                
-                d.mu        = mu;
+                d.B          = d.Q' * d.Bfull;
+                d.G          = -d.Bfull'*d.Ud;
 
-                d.Mu        = gf_asm('mass_matrix', integrationMethod, meshFemU);
-                d.Mp        = gf_asm('mass_matrix', integrationMethod, meshFemP);
-                d.Md        = gf_asm('mass_matrix', integrationMethod, meshFemD);
+                d.mu         = mu;
 
-                onesDsc     = gf_mesh_fem_get(meshFemD, 'eval', {1} );
-                d.Ku        = d.getKhat(onesDsc);
-                d.Kp        = gf_asm('laplacian', integrationMethod, meshFemP, meshFemD, onesDsc );
-                d.Kd        = gf_asm('laplacian', integrationMethod, meshFemD, meshFemD, onesDsc );
+                d.Mu         = gf_asm('mass_matrix', integrationMethod, meshFemU);
+                d.Mp         = gf_asm('mass_matrix', integrationMethod, meshFemP);
+                d.Md         = gf_asm('mass_matrix', integrationMethod, meshFemD);
+
+                onesDsc      = gf_mesh_fem_get(meshFemD, 'eval', {1} );
+                d.Ku         = d.getKhat(onesDsc);
+                d.Kp         = gf_asm('laplacian', integrationMethod, meshFemP, meshFemD, onesDsc );
+                d.Kd         = gf_asm('laplacian', integrationMethod, meshFemD, meshFemD, onesDsc );
+
+
+                d.meshPoints = gf_mesh_fem_get(d.meshFemU, 'eval', {'x', 'y'} )';
             end
 
         end
